@@ -458,3 +458,86 @@ kbd {
   margin-bottom: 2rem;
   margin-top: 0;
 }
+
+@media print {
+  body {
+    background: white !important;
+    background-image: none !important;
+    color: black !important;
+    padding-top: 2rem !important;
+  }
+
+  #root {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .glass-card {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .app-title {
+    color: black !important;
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    text-align: left !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 24pt !important;
+  }
+
+  .app-subtitle,
+  .input-container,
+  .item-actions,
+  .modal-overlay,
+  .btn-add {
+    display: none !important;
+  }
+
+  .todo-list {
+    gap: 0 !important;
+    display: block !important;
+  }
+
+  .todo-item {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid #efefef !important;
+    border-radius: 0 !important;
+    padding: 0.75rem 0 !important;
+    animation: none !important;
+    transform: none !important;
+    min-height: auto !important;
+    page-break-inside: avoid;
+  }
+
+  .todo-checkbox {
+    border: 1.5px solid #000 !important;
+    background: transparent !important;
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .todo-checkbox.completed {
+    background: #000 !important;
+    border-color: #000 !important;
+  }
+
+  .todo-checkbox.completed svg {
+    stroke: white !important;
+  }
+
+  .todo-text {
+    color: black !important;
+    font-size: 11pt !important;
+  }
+
+  .todo-text.completed {
+    opacity: 0.6 !important;
+    text-decoration: line-through !important;
+  }
+}
