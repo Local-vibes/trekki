@@ -633,6 +633,46 @@ input::placeholder {
   font-size: 0.95rem;
 }
 
+.export-modal-content {
+  max-width: 480px;
+}
+
+.export-markdown-preview {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  max-height: 280px;
+  overflow: auto;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-secondary);
+}
+
+.btn-copy-export {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-copy-export:hover {
+  opacity: 0.9;
+}
+
 kbd {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--card-border);

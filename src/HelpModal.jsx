@@ -48,6 +48,10 @@ export function HelpModal({ onClose }) {
                         <span>Toggle task completion</span>
                     </div>
                     <div className="shortcut-item">
+                        <kbd>p</kbd>
+                        <span>Export current list to markdown</span>
+                    </div>
+                    <div className="shortcut-item">
                         <kbd>h</kbd> <span>/</span> <kbd>?</kbd>
                         <span>Show this help</span>
                     </div>

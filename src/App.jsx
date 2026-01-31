@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Plus, Trash2, Check, X, Pencil, ChevronDown, FolderInput, MoreHorizontal, Settings2 } from 'lucide-react'
+import { Plus, Trash2, Check, X, Pencil, ChevronDown, FolderInput, MoreHorizontal, Settings2, Copy } from 'lucide-react'
 import {
   DndContext,
   closestCenter,
@@ -55,6 +55,9 @@ function App() {
   const [hoveredId, setHoveredId] = useState(null)
   const [hoveredListId, setHoveredListId] = useState(null)
   const [showHelp, setShowHelp] = useState(false)
+  const [showExportModal, setShowExportModal] = useState(false)
+  const [exportMarkdown, setExportMarkdown] = useState('')
+  const [copiedToClipboard, setCopiedToClipboard] = useState(false)
 
   // List edit state
   const [editingListId, setEditingListId] = useState(null)
@@ -176,6 +179,28 @@ function App() {
     setMovingItemId(null)
   }
 
+  const buildMarkdownForActiveList = () => {
+    const lines = [`# ${activeList.name}`, '']
+    activeList.items.forEach((item) => {
+      lines.push(item.completed ? `- [x] ${item.text}` : `- [ ] ${item.text}`)
+    })
+    return lines.join('\n')
+  }
+
+  const openExportModal = () => {
+    setExportMarkdown(buildMarkdownForActiveList())
+    setShowExportModal(true)
+    setCopiedToClipboard(false)
+  }
+
+  const copyExportToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(exportMarkdown)
+      setCopiedToClipboard(true)
+      setTimeout(() => setCopiedToClipboard(false), 2000)
+    } catch (_) {}
+  }
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Ignore if user is typing in an input
@@ -242,12 +267,20 @@ function App() {
             toggleTodo(hoveredId)
           }
           break
+        case 'p':
+          e.preventDefault()
+          openExportModal()
+          break
         case 'h':
         case '?':
           e.preventDefault()
           setShowHelp(true)
           break
         case 'escape':
+          if (showExportModal) {
+            e.preventDefault()
+            setShowExportModal(false)
+          }
           if (showHelp) {
             e.preventDefault()
             setShowHelp(false)
@@ -323,7 +356,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [hoveredId, hoveredListId, editingId, editingListId, openListMenuId, lists, todos, showHelp, past, future, isListMenuOpen, movingItemId])
+  }, [hoveredId, hoveredListId, editingId, editingListId, openListMenuId, lists, todos, showHelp, showExportModal, past, future, isListMenuOpen, movingItemId])
 
   // Click away listener for menus
   useEffect(() => {
@@ -686,6 +719,23 @@ function App() {
         }
       </div >
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+      {showExportModal && (
+        <div className="modal-overlay" onClick={() => setShowExportModal(false)}>
+          <div className="modal-content export-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Export to Markdown</h2>
+              <button className="btn-close-modal" onClick={() => setShowExportModal(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <pre className="export-markdown-preview">{exportMarkdown}</pre>
+            <button type="button" className="btn-copy-export" onClick={copyExportToClipboard}>
+              <Copy size={18} />
+              {copiedToClipboard ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+        </div>
+      )}
     </div >
   )
 }
