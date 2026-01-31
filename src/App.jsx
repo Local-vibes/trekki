@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Plus, Trash2, Check, X, Pencil } from 'lucide-react'
+import { Plus, Trash2, Check, X, Pencil, ChevronDown, FolderInput, MoreHorizontal, Settings2 } from 'lucide-react'
 import {
   DndContext,
   closestCenter,
@@ -17,10 +17,32 @@ import { SortableItem } from './SortableItem';
 import { HelpModal } from './HelpModal';
 
 function App() {
-  const [todos, setTodos] = useState(() => {
-    const saved = localStorage.getItem('todos')
-    return saved ? JSON.parse(saved) : []
+  const [lists, setLists] = useState(() => {
+    const savedLists = localStorage.getItem('trekki_lists')
+    if (savedLists) return JSON.parse(savedLists)
+
+    // Migration logic for existing single list
+    const oldTodos = localStorage.getItem('todos')
+    const initialItems = oldTodos ? JSON.parse(oldTodos) : []
+
+    return [{
+      id: 'default',
+      name: 'General',
+      items: initialItems,
+      createdAt: new Date().toISOString()
+    }]
   })
+
+  const [activeListId, setActiveListId] = useState(() => {
+    return localStorage.getItem('trekki_active_list') || 'default'
+  })
+
+  const [isListMenuOpen, setIsListMenuOpen] = useState(false)
+  const [movingItemId, setMovingItemId] = useState(null)
+
+  const activeList = lists.find(l => l.id === activeListId) || lists[0]
+  const todos = activeList.items
+
   const [inputValue, setInputValue] = useState('')
 
   // Edit state
@@ -37,10 +59,20 @@ function App() {
   const [past, setPast] = useState([])
   const [future, setFuture] = useState([])
 
-  const pushToHistory = (newTodos) => {
-    setPast(p => [...p, todos])
+  const pushToHistory = (newListsOrTodos) => {
+    setPast(p => [...p, lists])
     setFuture([])
-    setTodos(newTodos)
+
+    // Check if we passed a todo array (simple update to active list)
+    if (Array.isArray(newListsOrTodos) && (newListsOrTodos.length === 0 || 'text' in newListsOrTodos[0])) {
+      const newLists = lists.map(l =>
+        l.id === activeListId ? { ...l, items: newListsOrTodos } : l
+      )
+      setLists(newLists)
+    } else {
+      // Must be the whole lists array
+      setLists(newListsOrTodos)
+    }
   }
 
   const undo = () => {
@@ -48,17 +80,64 @@ function App() {
     const previous = past[past.length - 1]
     const newPast = past.slice(0, past.length - 1)
     setPast(newPast)
-    setFuture([todos, ...future])
-    setTodos(previous)
+    setFuture([lists, ...future])
+    setLists(previous)
   }
 
   const redo = () => {
     if (future.length === 0) return
     const next = future[0]
     const newFuture = future.slice(1)
-    setPast([...past, todos])
+    setPast([...past, lists])
     setFuture(newFuture)
-    setTodos(next)
+    setLists(next)
+  }
+
+  // List management
+  const addList = () => {
+    const newList = {
+      id: crypto.randomUUID(),
+      name: 'New List',
+      items: [],
+      createdAt: new Date().toISOString()
+    }
+    pushToHistory([...lists, newList])
+    setActiveListId(newList.id)
+    setIsListMenuOpen(false)
+  }
+
+  const deleteList = (id) => {
+    if (lists.length <= 1) return
+    const newLists = lists.filter(l => l.id !== id)
+    if (activeListId === id) {
+      setActiveListId(newLists[0].id)
+    }
+    pushToHistory(newLists)
+  }
+
+  const renameList = (id, newName) => {
+    if (!newName.trim()) return
+    const newLists = lists.map(l => l.id === id ? { ...l, name: newName.trim() } : l)
+    setLists(newLists) // Don't push to history for every keystroke? Or just on blur?
+    // Actually, rename often happens via prompt or dedicated input.
+  }
+
+  const moveTodo = (todoId, targetListId) => {
+    const todoToMove = todos.find(t => t.id === todoId)
+    if (!todoToMove) return
+
+    const newLists = lists.map(l => {
+      if (l.id === activeListId) {
+        return { ...l, items: l.items.filter(t => t.id !== todoId) }
+      }
+      if (l.id === targetListId) {
+        return { ...l, items: [todoToMove, ...l.items] }
+      }
+      return l
+    })
+
+    pushToHistory(newLists)
+    setMovingItemId(null)
   }
 
   useEffect(() => {
@@ -170,8 +249,12 @@ function App() {
   }, [hoveredId, editingId, todos, showHelp, past, future])
 
   useEffect(() => {
-    localStorage.setItem('todos', JSON.stringify(todos))
-  }, [todos])
+    localStorage.setItem('trekki_lists', JSON.stringify(lists))
+  }, [lists])
+
+  useEffect(() => {
+    localStorage.setItem('trekki_active_list', activeListId)
+  }, [activeListId])
 
   useEffect(() => {
     if (editingId && editInputRef.current) {
@@ -254,7 +337,62 @@ function App() {
 
   return (
     <div className="glass-card">
-      <h1 className="app-title">Trekki</h1>
+      <div className="header-container">
+        <h1 className="app-title">
+          <span className="breadcrumb-main">Trekki</span>
+          <span className="breadcrumb-separator">/</span>
+          <div
+            className="breadcrumb-list"
+            onClick={() => setIsListMenuOpen(!isListMenuOpen)}
+          >
+            {activeList.name}
+            <ChevronDown size={18} />
+          </div>
+        </h1>
+        {isListMenuOpen && (
+          <div className="dropdown-menu">
+            {lists.map(list => (
+              <div
+                key={list.id}
+                className={`dropdown-item ${list.id === activeListId ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveListId(list.id)
+                  setIsListMenuOpen(false)
+                }}
+              >
+                <span className="list-item-name">{list.name}</span>
+                <div className="list-item-actions">
+                  <button
+                    className="btn-action"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const newName = prompt('Enter new list name:', list.name)
+                      if (newName) renameList(list.id, newName)
+                    }}
+                  >
+                    <Pencil size={14} />
+                  </button>
+                  {lists.length > 1 && (
+                    <button
+                      className="btn-action btn-delete"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (confirm(`Delete list "${list.name}" and all its tasks?`)) deleteList(list.id)
+                      }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+            <div className="dropdown-divider"></div>
+            <div className="dropdown-item btn-add-list" onClick={addList}>
+              <Plus size={16} /> Add new list
+            </div>
+          </div>
+        )}
+      </div>
       <p className="app-subtitle">Press h or ? for help</p>
 
       <form onSubmit={addTodo} className="input-container">
@@ -342,13 +480,44 @@ function App() {
                           >
                             <Pencil size={16} />
                           </button>
-                          <button
-                            className="btn-action btn-delete"
-                            onClick={() => deleteTodo(todo.id)}
-                            title="Delete task"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          <div className="btn-move">
+                            <button
+                              className="btn-action"
+                              onClick={() => setMovingItemId(movingItemId === todo.id ? null : todo.id)}
+                              title="Move or delete task"
+                            >
+                              <MoreHorizontal size={16} />
+                            </button>
+
+                            {movingItemId === todo.id && (
+                              <div className="item-action-menu">
+                                <div className="action-menu-title">Move to List</div>
+                                {lists.filter(l => l.id !== activeListId).length === 0 ? (
+                                  <div className="action-menu-item" style={{ opacity: 0.5, cursor: 'default' }}>
+                                    No other lists
+                                  </div>
+                                ) : (
+                                  lists.filter(l => l.id !== activeListId).map(list => (
+                                    <div
+                                      key={list.id}
+                                      className="action-menu-item"
+                                      onClick={() => moveTodo(todo.id, list.id)}
+                                    >
+                                      <FolderInput size={14} />
+                                      {list.name}
+                                    </div>
+                                  ))
+                                )}
+                                <div
+                                  className="action-menu-item danger"
+                                  onClick={() => deleteTodo(todo.id)}
+                                >
+                                  <Trash2 size={14} />
+                                  Delete Task
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </>
                     )}

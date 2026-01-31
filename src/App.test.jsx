@@ -82,8 +82,10 @@ describe('App', () => {
         expect(screen.getByText('Task to Delete')).toBeInTheDocument();
 
         // Find delete button
-        const deleteButton = screen.getByTitle('Delete task');
-        await user.click(deleteButton);
+        const moreBtn = screen.getByTitle('Move or delete task');
+        await user.click(moreBtn);
+        const deleteItem = screen.getByText('Delete Task');
+        await user.click(deleteItem);
 
         expect(screen.queryByText('Task to Delete')).not.toBeInTheDocument();
     });
