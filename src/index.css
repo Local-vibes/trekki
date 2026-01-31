@@ -141,6 +141,15 @@ h1 {
   color: var(--accent-primary);
 }
 
+.dropdown-item.keyboard-selected {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.dropdown-item.active.keyboard-selected {
+  background: rgba(99, 102, 241, 0.15);
+}
+
 .dropdown-divider {
   height: 1px;
   background: var(--card-border);
@@ -167,8 +176,37 @@ h1 {
   transition: var(--transition-fast);
 }
 
-.dropdown-item:hover .list-item-actions {
+.dropdown-item:hover .list-item-actions,
+.dropdown-item.keyboard-selected .list-item-actions,
+.dropdown-item.menu-open .list-item-actions {
   opacity: 1;
+}
+
+.list-edit-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.list-edit-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 0.3rem 0.6rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.list-edit-input:focus {
+  border-color: var(--accent-primary);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.btn-more-list {
+  position: relative;
 }
 
 .item-action-menu {

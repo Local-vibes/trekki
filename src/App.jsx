@@ -53,7 +53,14 @@ function App() {
 
   // Hotkeys state
   const [hoveredId, setHoveredId] = useState(null)
+  const [hoveredListId, setHoveredListId] = useState(null)
   const [showHelp, setShowHelp] = useState(false)
+
+  // List edit state
+  const [editingListId, setEditingListId] = useState(null)
+  const [editListName, setEditListName] = useState('')
+  const [openListMenuId, setOpenListMenuId] = useState(null)
+  const listEditInputRef = useRef(null)
 
   // History state
   const [past, setPast] = useState([])
@@ -115,11 +122,40 @@ function App() {
     pushToHistory(newLists)
   }
 
+  const startEditingList = (list) => {
+    setEditingListId(list.id)
+    setEditListName(list.name)
+    setOpenListMenuId(null)
+  }
+
+  const cancelEditList = () => {
+    setEditingListId(null)
+    setEditListName('')
+  }
+
+  const saveEditList = (id) => {
+    if (!editListName.trim()) {
+      cancelEditList()
+      return
+    }
+    const newLists = lists.map(l => l.id === id ? { ...l, name: editListName.trim() } : l)
+    pushToHistory(newLists)
+    setEditingListId(null)
+    setEditListName('')
+  }
+
+  const handleListEditKeyDown = (e, id) => {
+    if (e.key === 'Enter') {
+      saveEditList(id)
+    } else if (e.key === 'Escape') {
+      cancelEditList()
+    }
+  }
+
   const renameList = (id, newName) => {
     if (!newName.trim()) return
     const newLists = lists.map(l => l.id === id ? { ...l, name: newName.trim() } : l)
-    setLists(newLists) // Don't push to history for every keystroke? Or just on blur?
-    // Actually, rename often happens via prompt or dedicated input.
+    setLists(newLists)
   }
 
   const moveTodo = (todoId, targetListId) => {
@@ -178,14 +214,21 @@ function App() {
           }
           break
         case 'e':
-          if (hoveredId && !editingId) {
+          if (isListMenuOpen && hoveredListId && !editingListId) {
+            e.preventDefault()
+            const listToEdit = lists.find(l => l.id === hoveredListId)
+            if (listToEdit) startEditingList(listToEdit)
+          } else if (hoveredId && !editingId) {
             e.preventDefault()
             const todoToEdit = todos.find(t => t.id === hoveredId)
             if (todoToEdit) startEditing(todoToEdit)
           }
           break
         case 'd':
-          if (hoveredId) {
+          if (isListMenuOpen && hoveredListId) {
+            e.preventDefault()
+            deleteList(hoveredListId)
+          } else if (hoveredId) {
             e.preventDefault()
             deleteTodo(hoveredId)
           }
@@ -207,8 +250,14 @@ function App() {
             setShowHelp(false)
           }
           if (isListMenuOpen) {
-            e.preventDefault()
-            setIsListMenuOpen(false)
+            if (openListMenuId) {
+              setOpenListMenuId(null)
+            } else if (editingListId) {
+              cancelEditList()
+            } else {
+              e.preventDefault()
+              setIsListMenuOpen(false)
+            }
           }
           if (movingItemId) {
             e.preventDefault()
@@ -217,6 +266,23 @@ function App() {
           break;
         case 'arrowup':
         case 'arrowdown': {
+          if (isListMenuOpen) {
+            e.preventDefault()
+            const currentIndex = hoveredListId ? lists.findIndex(l => l.id === hoveredListId) : -1
+            const isUp = e.key.toLowerCase() === 'arrowup'
+            let nextIndex
+            if (currentIndex === -1) {
+              nextIndex = isUp ? lists.length - 1 : 0
+            } else {
+              if (isUp) {
+                nextIndex = currentIndex <= 0 ? lists.length - 1 : currentIndex - 1
+              } else {
+                nextIndex = currentIndex >= lists.length - 1 ? 0 : currentIndex + 1
+              }
+            }
+            setHoveredListId(lists[nextIndex].id)
+            return
+          }
           if (todos.length === 0) return
           e.preventDefault()
 
@@ -254,7 +320,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [hoveredId, editingId, todos, showHelp, past, future, isListMenuOpen, movingItemId])
+  }, [hoveredId, hoveredListId, editingId, editingListId, openListMenuId, lists, todos, showHelp, past, future, isListMenuOpen, movingItemId])
 
   // Click away listener for menus
   useEffect(() => {
@@ -262,6 +328,13 @@ function App() {
       // Close list menu if click is outside switcher and dropdown
       if (isListMenuOpen && !e.target.closest('.dropdown-menu') && !e.target.closest('.breadcrumb-list')) {
         setIsListMenuOpen(false)
+        setOpenListMenuId(null)
+        setEditingListId(null)
+      }
+
+      // Close list action menu if click is outside
+      if (openListMenuId && !e.target.closest('.item-action-menu') && !e.target.closest('.btn-more-list')) {
+        setOpenListMenuId(null)
       }
 
       // Close item action menu if click is outside the "More" button and the menu itself
@@ -272,7 +345,7 @@ function App() {
 
     window.addEventListener('mousedown', handleClickAway)
     return () => window.removeEventListener('mousedown', handleClickAway)
-  }, [isListMenuOpen, movingItemId])
+  }, [isListMenuOpen, movingItemId, openListMenuId])
 
   useEffect(() => {
     localStorage.setItem('trekki_lists', JSON.stringify(lists))
@@ -287,6 +360,12 @@ function App() {
       editInputRef.current.focus()
     }
   }, [editingId])
+
+  useEffect(() => {
+    if (editingListId && listEditInputRef.current) {
+      listEditInputRef.current.focus()
+    }
+  }, [editingListId])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -380,36 +459,77 @@ function App() {
             {lists.map(list => (
               <div
                 key={list.id}
-                className={`dropdown-item ${list.id === activeListId ? 'active' : ''}`}
+                className={`dropdown-item ${list.id === activeListId ? 'active' : ''} ${hoveredListId === list.id ? 'keyboard-selected' : ''} ${openListMenuId === list.id ? 'menu-open' : ''} ${editingListId === list.id ? 'editing' : ''}`}
                 onClick={() => {
-                  setActiveListId(list.id)
-                  setIsListMenuOpen(false)
+                  if (editingListId !== list.id) {
+                    setActiveListId(list.id)
+                    setIsListMenuOpen(false)
+                  }
                 }}
+                onMouseEnter={() => setHoveredListId(list.id)}
+                onMouseLeave={() => setHoveredListId(null)}
               >
-                <span className="list-item-name">{list.name}</span>
-                <div className="list-item-actions">
-                  <button
-                    className="btn-action"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      const newName = prompt('Enter new list name:', list.name)
-                      if (newName) renameList(list.id, newName)
-                    }}
-                  >
-                    <Pencil size={14} />
-                  </button>
-                  {lists.length > 1 && (
-                    <button
-                      className="btn-action btn-delete"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        if (confirm(`Delete list "${list.name}" and all its tasks?`)) deleteList(list.id)
-                      }}
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  )}
-                </div>
+                {editingListId === list.id ? (
+                  <div className="list-edit-container">
+                    <input
+                      ref={listEditInputRef}
+                      type="text"
+                      className="list-edit-input"
+                      value={editListName}
+                      onChange={(e) => setEditListName(e.target.value)}
+                      onKeyDown={(e) => handleListEditKeyDown(e, list.id)}
+                      onBlur={() => saveEditList(list.id)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <span className="list-item-name">{list.name}</span>
+                    <div className={`list-item-actions ${openListMenuId === list.id ? 'menu-open' : ''}`}>
+                      <div className="btn-more-list">
+                        <button
+                          className="btn-action"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setOpenListMenuId(openListMenuId === list.id ? null : list.id)
+                          }}
+                          title="More actions"
+                        >
+                          <MoreHorizontal size={14} />
+                        </button>
+
+                        {openListMenuId === list.id && (
+                          <div className="item-action-menu">
+                            <div
+                              className="action-menu-item"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                startEditingList(list)
+                              }}
+                            >
+                              <Pencil size={14} />
+                              <span>Rename List</span>
+                              <kbd className="menu-kbd">e</kbd>
+                            </div>
+                            {lists.length > 1 && (
+                              <div
+                                className="action-menu-item danger"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  if (confirm(`Delete list "${list.name}" and all its tasks?`)) deleteList(list.id)
+                                }}
+                              >
+                                <Trash2 size={14} />
+                                <span>Delete List</span>
+                                <kbd className="menu-kbd">d</kbd>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
             <div className="dropdown-divider"></div>
