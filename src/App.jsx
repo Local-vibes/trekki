@@ -135,7 +135,10 @@ function App() {
             if (!isUp && currentIndex === todos.length - 1) return
 
             const nextIndex = isUp ? currentIndex - 1 : currentIndex + 1
-            pushToHistory(arrayMove(todos, currentIndex, nextIndex))
+            const newTodos = [...todos]
+            const [movedItem] = newTodos.splice(currentIndex, 1)
+            newTodos.splice(nextIndex, 0, movedItem)
+            pushToHistory(newTodos)
           } else {
             // Navigation with looping
             let nextIndex
@@ -282,6 +285,13 @@ function App() {
                     onMouseEnter={() => setHoveredId(todo.id)}
                     onMouseLeave={() => setHoveredId(null)}
                   >
+                    <div
+                      className={`todo-checkbox ${todo.completed ? 'completed' : ''} ${editingId === todo.id ? 'editing-placeholder' : ''}`}
+                      onClick={() => editingId !== todo.id && toggleTodo(todo.id)}
+                    >
+                      {todo.completed && <Check size={14} color="white" />}
+                    </div>
+
                     {editingId === todo.id ? (
                       <div className="edit-container">
                         <input
@@ -312,12 +322,6 @@ function App() {
                       </div>
                     ) : (
                       <>
-                        <div
-                          className={`todo-checkbox ${todo.completed ? 'completed' : ''}`}
-                          onClick={() => toggleTodo(todo.id)}
-                        >
-                          {todo.completed && <Check size={14} color="white" />}
-                        </div>
                         <span className={`todo-text ${todo.completed ? 'completed' : ''}`}>
                           {todo.text}
                         </span>

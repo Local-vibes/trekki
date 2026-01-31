@@ -141,8 +141,8 @@ input::placeholder {
 .todo-item.editing {
   background: rgba(99, 102, 241, 0.05);
   border-color: rgba(99, 102, 241, 0.2);
-  padding: 0.5rem;
-  /* Different padding for edit mode */
+  padding: 1rem;
+  /* Match base padding to prevent jump */
 }
 
 .edit-container {
@@ -157,9 +157,12 @@ input::placeholder {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--card-border);
   border-radius: 12px;
-  padding: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  /* Adjusted to match text height */
   color: var(--text-primary);
   font-size: 0.95rem;
+  line-height: 1.4;
+  /* Ensure vertical consistency */
   outline: none;
   transition: var(--transition-fast);
 }
@@ -245,6 +248,12 @@ input::placeholder {
   transform: translateX(4px);
 }
 
+/* Skip hover transform while editing to prevent jitter */
+.todo-item.editing:hover,
+.todo-item.editing.keyboard-selected {
+  transform: none;
+}
+
 .todo-item.keyboard-selected {
   border-color: var(--accent-primary);
   box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
@@ -252,7 +261,6 @@ input::placeholder {
 
 /* Adjustments for when editing, disable hover effect */
 .todo-item.editing:hover {
-  transform: none;
   background: rgba(99, 102, 241, 0.05);
 }
 
@@ -273,6 +281,12 @@ input::placeholder {
 .todo-checkbox.completed {
   background: var(--success);
   border-color: var(--success);
+}
+
+.todo-checkbox.editing-placeholder {
+  pointer-events: none;
+  opacity: 0.3;
+  border-style: dashed;
 }
 
 .todo-text {

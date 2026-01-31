@@ -178,14 +178,14 @@ describe('Hotkeys', () => {
         await user.keyboard('{ArrowDown}');
 
         // Try to move Task 2 UP (should do nothing because it's at index 0)
-        fireEvent.keyDown(window, { key: 'ArrowUp', ctrlKey: true, shiftKey: true });
+        await user.keyboard('{Control>}{Shift>}{ArrowUp}{/Shift}{/Control}');
         let tasks = screen.getAllByRole('button', { name: /Edit task/i }).map(btn =>
             btn.closest('.todo-item').querySelector('.todo-text').textContent
         );
         expect(tasks).toEqual(['Task 2', 'Task 1']);
 
         // Move Task 2 DOWN
-        fireEvent.keyDown(window, { key: 'ArrowDown', ctrlKey: true, shiftKey: true });
+        await user.keyboard('{Control>}{Shift>}{ArrowDown}{/Shift}{/Control}');
 
         // Now Task 2 should be after Task 1
         await waitFor(() => {
