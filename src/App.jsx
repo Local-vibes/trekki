@@ -499,24 +499,29 @@ function App() {
                           {todo.text}
                         </span>
                         <div className={`item-actions ${movingItemId === todo.id ? 'menu-open' : ''}`}>
-                          <button
-                            className="btn-action btn-edit"
-                            onClick={() => startEditing(todo)}
-                            title="Edit task"
-                          >
-                            <Pencil size={16} />
-                          </button>
                           <div className="btn-move">
                             <button
                               className="btn-action"
                               onClick={() => setMovingItemId(movingItemId === todo.id ? null : todo.id)}
-                              title="Move or delete task"
+                              title="More actions"
                             >
                               <MoreHorizontal size={16} />
                             </button>
 
                             {movingItemId === todo.id && (
                               <div className="item-action-menu">
+                                <div
+                                  className="action-menu-item"
+                                  onClick={() => {
+                                    startEditing(todo)
+                                    setMovingItemId(null)
+                                  }}
+                                >
+                                  <Pencil size={14} />
+                                  <span>Edit Task</span>
+                                  <kbd className="menu-kbd">e</kbd>
+                                </div>
+                                <div className="action-menu-divider"></div>
                                 <div className="action-menu-title">Move to List</div>
                                 {lists.filter(l => l.id !== activeListId).length === 0 ? (
                                   <div className="action-menu-item" style={{ opacity: 0.5, cursor: 'default' }}>
@@ -530,7 +535,7 @@ function App() {
                                       onClick={() => moveTodo(todo.id, list.id)}
                                     >
                                       <FolderInput size={14} />
-                                      {list.name}
+                                      <span>{list.name}</span>
                                     </div>
                                   ))
                                 )}
@@ -539,7 +544,8 @@ function App() {
                                   onClick={() => deleteTodo(todo.id)}
                                 >
                                   <Trash2 size={14} />
-                                  Delete Task
+                                  <span>Delete</span>
+                                  <kbd className="menu-kbd">d</kbd>
                                 </div>
                               </div>
                             )}

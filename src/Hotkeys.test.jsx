@@ -179,7 +179,7 @@ describe('Hotkeys', () => {
 
         // Try to move Task 2 UP (should do nothing because it's at index 0)
         await user.keyboard('{Control>}{Shift>}{ArrowUp}{/Shift}{/Control}');
-        let tasks = screen.getAllByRole('button', { name: /Edit task/i }).map(btn =>
+        let tasks = screen.getAllByTitle('More actions').map(btn =>
             btn.closest('.todo-item').querySelector('.todo-text').textContent
         );
         expect(tasks).toEqual(['Task 2', 'Task 1']);
@@ -189,7 +189,7 @@ describe('Hotkeys', () => {
 
         // Now Task 2 should be after Task 1
         await waitFor(() => {
-            const tasks = screen.getAllByRole('button', { name: /Edit task/i }).map(btn =>
+            const tasks = screen.getAllByTitle('More actions').map(btn =>
                 btn.closest('.todo-item').querySelector('.todo-text').textContent
             );
             expect(tasks).toEqual(['Task 1', 'Task 2']);
@@ -197,7 +197,7 @@ describe('Hotkeys', () => {
 
         // Try to move Task 2 DOWN again (should do nothing)
         await user.keyboard('{Control>}{Shift>}{ArrowDown}{/Shift}{/Control}');
-        tasks = screen.getAllByRole('button', { name: /Edit task/i }).map(btn =>
+        tasks = screen.getAllByTitle('More actions').map(btn =>
             btn.closest('.todo-item').querySelector('.todo-text').textContent
         );
         expect(tasks).toEqual(['Task 1', 'Task 2']);

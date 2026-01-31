@@ -200,6 +200,7 @@ h1 {
 .action-menu-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.6rem;
   padding: 0.5rem 0.6rem;
   border-radius: 8px;
@@ -209,6 +210,33 @@ h1 {
   transition: var(--transition-fast);
 }
 
+.action-menu-item span {
+  flex: 1;
+}
+
+.menu-kbd {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-family: inherit;
+  box-shadow: 0 1px 0 var(--card-border);
+  margin-left: auto;
+}
+
+.action-menu-item:hover .menu-kbd {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.action-menu-divider {
+  height: 1px;
+  background: var(--card-border);
+  margin: 0.4rem 0.2rem;
+}
+
 .action-menu-item:hover {
   background: rgba(255, 255, 255, 0.05);
 }
@@ -216,12 +244,15 @@ h1 {
 .action-menu-item.danger {
   color: var(--danger);
   margin-top: 0.25rem;
-  border-top: 1px solid var(--card-border);
-  border-radius: 0 0 8px 8px;
+  border-radius: 8px;
 }
 
 .action-menu-item.danger:hover {
   background: rgba(239, 68, 68, 0.1);
+}
+
+.action-menu-item.danger .menu-kbd {
+  border-color: rgba(239, 68, 68, 0.2);
 }
 
 .btn-move {

@@ -58,9 +58,13 @@ describe('App', () => {
         const input = screen.getByPlaceholderText(/What needs to be done?/i);
         await user.type(input, 'Task to Edit{enter}');
 
-        // Find edit button
-        const editButton = screen.getByTitle('Edit task');
-        await user.click(editButton);
+        // Find and click more button
+        const moreBtn = screen.getByTitle('More actions');
+        await user.click(moreBtn);
+
+        // Find edit item in menu
+        const editItem = screen.getByText('Edit Task');
+        await user.click(editItem);
 
         // Edit input should appear
         const editInput = screen.getByDisplayValue('Task to Edit');
@@ -82,9 +86,9 @@ describe('App', () => {
         expect(screen.getByText('Task to Delete')).toBeInTheDocument();
 
         // Find delete button
-        const moreBtn = screen.getByTitle('Move or delete task');
+        const moreBtn = screen.getByTitle('More actions');
         await user.click(moreBtn);
-        const deleteItem = screen.getByText('Delete Task');
+        const deleteItem = screen.getByText('Delete');
         await user.click(deleteItem);
 
         expect(screen.queryByText('Task to Delete')).not.toBeInTheDocument();

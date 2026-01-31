@@ -46,9 +46,9 @@ describe('Undo/Redo Functionality', () => {
         fireEvent.change(input, { target: { value: 'Todo to Delete' } })
         fireEvent.submit(input)
 
-        const moreBtn = screen.getByTitle('Move or delete task')
+        const moreBtn = screen.getByTitle('More actions')
         fireEvent.click(moreBtn)
-        const deleteItem = screen.getByText('Delete Task')
+        const deleteItem = screen.getByText('Delete')
         fireEvent.click(deleteItem)
 
         expect(screen.queryByText('Todo to Delete')).toBeNull()
