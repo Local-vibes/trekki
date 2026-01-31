@@ -508,7 +508,7 @@ function App() {
                               }}
                             >
                               <Pencil size={14} />
-                              <span>Rename List</span>
+                              <span>Rename</span>
                               <kbd className="menu-kbd">e</kbd>
                             </div>
                             {lists.length > 1 && (
@@ -520,7 +520,7 @@ function App() {
                                 }}
                               >
                                 <Trash2 size={14} />
-                                <span>Delete List</span>
+                                <span>Delete</span>
                                 <kbd className="menu-kbd">d</kbd>
                               </div>
                             )}
@@ -638,7 +638,7 @@ function App() {
                                   }}
                                 >
                                   <Pencil size={14} />
-                                  <span>Edit Task</span>
+                                  <span>Edit</span>
                                   <kbd className="menu-kbd">e</kbd>
                                 </div>
                                 <div className="action-menu-divider"></div>

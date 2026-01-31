@@ -63,7 +63,7 @@ describe('App', () => {
         await user.click(moreBtn);
 
         // Find edit item in menu
-        const editItem = screen.getByText('Edit Task');
+        const editItem = screen.getByText('Edit');
         await user.click(editItem);
 
         // Edit input should appear
