@@ -1,0 +1,278 @@
+import React, { useState, useEffect, useRef } from 'react'
+import { Plus, Trash2, Check, X, Pencil } from 'lucide-react'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { SortableItem } from './SortableItem';
+import { HelpModal } from './HelpModal';
+
+function App() {
+  const [todos, setTodos] = useState(() => {
+    const saved = localStorage.getItem('todos')
+    return saved ? JSON.parse(saved) : []
+  })
+  const [inputValue, setInputValue] = useState('')
+
+  // Edit state
+  const [editingId, setEditingId] = useState(null)
+  const [editText, setEditText] = useState('')
+  const editInputRef = useRef(null)
+
+  // Hotkeys state
+  const [hoveredId, setHoveredId] = useState(null)
+  const [showHelp, setShowHelp] = useState(false)
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ignore if user is typing in an input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+
+      switch (e.key.toLowerCase()) {
+        case 'e':
+          if (hoveredId && !editingId) {
+            e.preventDefault()
+            const todoToEdit = todos.find(t => t.id === hoveredId)
+            if (todoToEdit) startEditing(todoToEdit)
+          }
+          break
+        case 'd':
+          if (hoveredId) {
+            e.preventDefault()
+            deleteTodo(hoveredId)
+          }
+          break
+        case 'c':
+          if (hoveredId && !editingId) {
+            e.preventDefault()
+            toggleTodo(hoveredId)
+          }
+          break
+        case 'h':
+        case '?':
+          e.preventDefault()
+          setShowHelp(true)
+          break
+        case 'escape':
+          if (showHelp) {
+            e.preventDefault()
+            setShowHelp(false)
+          }
+          break
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [hoveredId, editingId, todos, showHelp])
+
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos))
+  }, [todos])
+
+  useEffect(() => {
+    if (editingId && editInputRef.current) {
+      editInputRef.current.focus()
+    }
+  }, [editingId])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setTodos((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  const addTodo = (e) => {
+    e.preventDefault()
+    if (!inputValue.trim()) return
+
+    const newTodo = {
+      id: crypto.randomUUID(),
+      text: inputValue.trim(),
+      completed: false,
+      createdAt: new Date().toISOString()
+    }
+
+    setTodos([newTodo, ...todos])
+    setInputValue('')
+  }
+
+  const toggleTodo = (id) => {
+    if (editingId === id) return // Prevent toggling while editing
+    setTodos(todos.map(todo =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ))
+  }
+
+  const deleteTodo = (id) => {
+    setTodos(todos.filter(todo => todo.id !== id))
+  }
+
+  // Edit handlers
+  const startEditing = (todo) => {
+    setEditingId(todo.id)
+    setEditText(todo.text)
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditText('')
+  }
+
+  const saveEdit = (id) => {
+    if (!editText.trim()) return
+
+    setTodos(todos.map(todo =>
+      todo.id === id ? { ...todo, text: editText.trim() } : todo
+    ))
+    setEditingId(null)
+    setEditText('')
+  }
+
+  const handleEditKeyDown = (e, id) => {
+    if (e.key === 'Enter') {
+      saveEdit(id)
+    } else if (e.key === 'Escape') {
+      cancelEdit()
+    }
+  }
+
+  return (
+    <div className="glass-card">
+      <h1 className="app-title">Trekki</h1>
+      <p className="app-subtitle">Press h or ? for help</p>
+
+      <form onSubmit={addTodo} className="input-container">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="What needs to be done?"
+          autoFocus={!editingId}
+        />
+        <button type="submit" className="btn-add">
+          <Plus size={20} />
+        </button>
+      </form>
+
+      <div className="todo-list">
+        {todos.length === 0 ? (
+          <p style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem', padding: '2rem 0' }}>
+            No tasks yet. Start by adding one!
+          </p>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={todos}
+              strategy={verticalListSortingStrategy}
+            >
+              {todos.map(todo => (
+                <SortableItem key={todo.id} id={todo.id}>
+                  <div
+                    className={`todo-item ${editingId === todo.id ? 'editing' : ''}`}
+                    onMouseEnter={() => setHoveredId(todo.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                  >
+                    {editingId === todo.id ? (
+                      <div className="edit-container">
+                        <input
+                          ref={editInputRef}
+                          type="text"
+                          className="edit-input"
+                          value={editText}
+                          onChange={(e) => setEditText(e.target.value)}
+                          onKeyDown={(e) => handleEditKeyDown(e, todo.id)}
+                          onBlur={() => saveEdit(todo.id)}
+                        />
+                        <div className="edit-actions">
+                          <button
+                            className="btn-action btn-save"
+                            onMouseDown={(e) => e.preventDefault()} // Prevent blur before click
+                            onClick={() => saveEdit(todo.id)}
+                          >
+                            <Check size={16} />
+                          </button>
+                          <button
+                            className="btn-action btn-cancel"
+                            onMouseDown={(e) => e.preventDefault()} // Prevent blur before click
+                            onClick={cancelEdit}
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div
+                          className={`todo-checkbox ${todo.completed ? 'completed' : ''}`}
+                          onClick={() => toggleTodo(todo.id)}
+                        >
+                          {todo.completed && <Check size={14} color="white" />}
+                        </div>
+                        <span className={`todo-text ${todo.completed ? 'completed' : ''}`}>
+                          {todo.text}
+                        </span>
+                        <div className="item-actions">
+                          <button
+                            className="btn-action btn-edit"
+                            onClick={() => startEditing(todo)}
+                            title="Edit task"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button
+                            className="btn-action btn-delete"
+                            onClick={() => deleteTodo(todo.id)}
+                            title="Delete task"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </SortableItem>
+              ))}
+            </SortableContext>
+          </DndContext>
+        )
+        }
+      </div >
+      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+    </div >
+  )
+}
+
+export default App
