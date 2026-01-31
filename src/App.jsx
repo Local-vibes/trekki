@@ -27,6 +27,7 @@ function App() {
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState('')
   const editInputRef = useRef(null)
+  const mainInputRef = useRef(null)
 
   // Hotkeys state
   const [hoveredId, setHoveredId] = useState(null)
@@ -90,6 +91,12 @@ function App() {
         case 'r':
           e.preventDefault()
           redo()
+          break
+        case 'a':
+          e.preventDefault()
+          if (mainInputRef.current) {
+            mainInputRef.current.focus()
+          }
           break
         case 'e':
           if (hoveredId && !editingId) {
@@ -252,9 +259,11 @@ function App() {
 
       <form onSubmit={addTodo} className="input-container">
         <input
+          ref={mainInputRef}
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => e.key === 'Escape' && e.target.blur()}
           placeholder="What needs to be done?"
           autoFocus={!editingId}
         />

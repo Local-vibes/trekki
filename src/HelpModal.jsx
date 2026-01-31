@@ -20,6 +20,10 @@ export function HelpModal({ onClose }) {
                         <span>Navigate items</span>
                     </div>
                     <div className="shortcut-item">
+                        <kbd>a</kbd>
+                        <span>Focus "Add item" input</span>
+                    </div>
+                    <div className="shortcut-item">
                         <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>↑</kbd>/<kbd>↓</kbd>
                         <span>Move item up / down</span>
                     </div>
@@ -49,7 +53,7 @@ export function HelpModal({ onClose }) {
                     </div>
                     <div className="shortcut-item">
                         <kbd>Esc</kbd>
-                        <span>Cancel edit / Close modal</span>
+                        <span>Cancel edit / Defocus / Close modal</span>
                     </div>
                     <div className="shortcut-item">
                         <kbd>Enter</kbd>

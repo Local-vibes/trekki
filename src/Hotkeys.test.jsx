@@ -202,4 +202,24 @@ describe('Hotkeys', () => {
         );
         expect(tasks).toEqual(['Task 1', 'Task 2']);
     });
+
+    it('focuses main input when pressing "a" and defocuses when pressing "Esc"', async () => {
+        const user = userEvent.setup();
+        render(<App />);
+
+        const input = screen.getByPlaceholderText(/What needs to be done?/i);
+
+        // Initial state: auto-focus is on (unless editing, which we aren't)
+        // Let's explicitly blur it first
+        input.blur();
+        expect(input).not.toHaveFocus();
+
+        // Press 'a'
+        await user.keyboard('a');
+        expect(input).toHaveFocus();
+
+        // Press 'Esc'
+        await user.keyboard('{Escape}');
+        expect(input).not.toHaveFocus();
+    });
 });
