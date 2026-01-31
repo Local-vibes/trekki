@@ -33,12 +33,65 @@ function App() {
   const [hoveredId, setHoveredId] = useState(null)
   const [showHelp, setShowHelp] = useState(false)
 
+  // History state
+  const [past, setPast] = useState([])
+  const [future, setFuture] = useState([])
+
+  const pushToHistory = (newTodos) => {
+    setPast(p => [...p, todos])
+    setFuture([])
+    setTodos(newTodos)
+  }
+
+  const undo = () => {
+    if (past.length === 0) return
+    const previous = past[past.length - 1]
+    const newPast = past.slice(0, past.length - 1)
+    setPast(newPast)
+    setFuture([todos, ...future])
+    setTodos(previous)
+  }
+
+  const redo = () => {
+    if (future.length === 0) return
+    const next = future[0]
+    const newFuture = future.slice(1)
+    setPast([...past, todos])
+    setFuture(newFuture)
+    setTodos(next)
+  }
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Ignore if user is typing in an input
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
 
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
+      const isCmdOrCtrl = isMac ? e.metaKey : e.ctrlKey
+
+      // Undo/Redo shortcuts
+      if (isCmdOrCtrl) {
+        if (e.key.toLowerCase() === 'z') {
+          if (e.shiftKey) {
+            e.preventDefault()
+            redo()
+          } else {
+            e.preventDefault()
+            undo()
+          }
+          return
+        }
+      }
+
       switch (e.key.toLowerCase()) {
+        case 'u':
+          e.preventDefault()
+          undo()
+          break
+        case 'r':
+          e.preventDefault()
+          redo()
+          break
         case 'e':
           if (hoveredId && !editingId) {
             e.preventDefault()
@@ -74,7 +127,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [hoveredId, editingId, todos, showHelp])
+  }, [hoveredId, editingId, todos, showHelp, past, future])
 
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos))
@@ -101,12 +154,9 @@ function App() {
     const { active, over } = event;
 
     if (active.id !== over.id) {
-      setTodos((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-
-        return arrayMove(items, oldIndex, newIndex);
-      });
+      const oldIndex = todos.findIndex((item) => item.id === active.id);
+      const newIndex = todos.findIndex((item) => item.id === over.id);
+      pushToHistory(arrayMove(todos, oldIndex, newIndex));
     }
   };
 
@@ -121,19 +171,19 @@ function App() {
       createdAt: new Date().toISOString()
     }
 
-    setTodos([newTodo, ...todos])
+    pushToHistory([newTodo, ...todos])
     setInputValue('')
   }
 
   const toggleTodo = (id) => {
     if (editingId === id) return // Prevent toggling while editing
-    setTodos(todos.map(todo =>
+    pushToHistory(todos.map(todo =>
       todo.id === id ? { ...todo, completed: !todo.completed } : todo
     ))
   }
 
   const deleteTodo = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id))
+    pushToHistory(todos.filter(todo => todo.id !== id))
   }
 
   // Edit handlers
@@ -150,7 +200,7 @@ function App() {
   const saveEdit = (id) => {
     if (!editText.trim()) return
 
-    setTodos(todos.map(todo =>
+    pushToHistory(todos.map(todo =>
       todo.id === id ? { ...todo, text: editText.trim() } : todo
     ))
     setEditingId(null)

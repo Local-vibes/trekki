@@ -16,6 +16,14 @@ export function HelpModal({ onClose }) {
                 </div>
                 <div className="shortcuts-list">
                     <div className="shortcut-item">
+                        <kbd>u</kbd> <span>/</span> <kbd>Ctrl+Z</kbd>
+                        <span>Undo last action</span>
+                    </div>
+                    <div className="shortcut-item">
+                        <kbd>r</kbd> <span>/</span> <kbd>Ctrl+Shift+Z</kbd>
+                        <span>Redo last action</span>
+                    </div>
+                    <div className="shortcut-item">
                         <kbd>e</kbd>
                         <span>Edit hovered task</span>
                     </div>
