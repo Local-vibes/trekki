@@ -16,6 +16,14 @@ export function HelpModal({ onClose }) {
                 </div>
                 <div className="shortcuts-list">
                     <div className="shortcut-item">
+                        <kbd>↑</kbd> <span>/</span> <kbd>↓</kbd>
+                        <span>Navigate items</span>
+                    </div>
+                    <div className="shortcut-item">
+                        <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>↑</kbd>/<kbd>↓</kbd>
+                        <span>Move item up / down</span>
+                    </div>
+                    <div className="shortcut-item">
                         <kbd>u</kbd> <span>/</span> <kbd>Ctrl+Z</kbd>
                         <span>Undo last action</span>
                     </div>
@@ -25,11 +33,11 @@ export function HelpModal({ onClose }) {
                     </div>
                     <div className="shortcut-item">
                         <kbd>e</kbd>
-                        <span>Edit hovered task</span>
+                        <span>Edit hovered/selected task</span>
                     </div>
                     <div className="shortcut-item">
                         <kbd>d</kbd>
-                        <span>Delete hovered task</span>
+                        <span>Delete hovered/selected task</span>
                     </div>
                     <div className="shortcut-item">
                         <kbd>c</kbd>

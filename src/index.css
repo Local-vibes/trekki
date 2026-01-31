@@ -222,7 +222,8 @@ input::placeholder {
   transition: var(--transition-fast);
 }
 
-.todo-item:hover .item-actions {
+.todo-item:hover .item-actions,
+.todo-item.keyboard-selected .item-actions {
   opacity: 1;
 }
 
@@ -238,9 +239,15 @@ input::placeholder {
   }
 }
 
-.todo-item:hover {
+.todo-item:hover,
+.todo-item.keyboard-selected {
   background: rgba(255, 255, 255, 0.04);
   transform: translateX(4px);
+}
+
+.todo-item.keyboard-selected {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
 }
 
 /* Adjustments for when editing, disable hover effect */

@@ -11,7 +11,6 @@ import {
 import {
   arrayMove,
   SortableContext,
-  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { SortableItem } from './SortableItem';
@@ -122,6 +121,37 @@ function App() {
             setShowHelp(false)
           }
           break
+        case 'arrowup':
+        case 'arrowdown': {
+          if (todos.length === 0) return
+          e.preventDefault()
+
+          const currentIndex = hoveredId ? todos.findIndex(t => t.id === hoveredId) : -1
+          const isUp = e.key.toLowerCase() === 'arrowup'
+          const isReorder = (e.ctrlKey || e.metaKey) && e.shiftKey
+          if (isReorder) {
+            if (currentIndex === -1) return
+            if (isUp && currentIndex === 0) return
+            if (!isUp && currentIndex === todos.length - 1) return
+
+            const nextIndex = isUp ? currentIndex - 1 : currentIndex + 1
+            pushToHistory(arrayMove(todos, currentIndex, nextIndex))
+          } else {
+            // Navigation with looping
+            let nextIndex
+            if (currentIndex === -1) {
+              nextIndex = isUp ? todos.length - 1 : 0
+            } else {
+              if (isUp) {
+                nextIndex = currentIndex <= 0 ? todos.length - 1 : currentIndex - 1
+              } else {
+                nextIndex = currentIndex >= todos.length - 1 ? 0 : currentIndex + 1
+              }
+            }
+            setHoveredId(todos[nextIndex].id)
+          }
+          break
+        }
       }
     }
 
@@ -144,9 +174,6 @@ function App() {
       activationConstraint: {
         distance: 8,
       },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
@@ -251,7 +278,7 @@ function App() {
               {todos.map(todo => (
                 <SortableItem key={todo.id} id={todo.id}>
                   <div
-                    className={`todo-item ${editingId === todo.id ? 'editing' : ''}`}
+                    className={`todo-item ${editingId === todo.id ? 'editing' : ''} ${hoveredId === todo.id ? 'keyboard-selected' : ''}`}
                     onMouseEnter={() => setHoveredId(todo.id)}
                     onMouseLeave={() => setHoveredId(null)}
                   >

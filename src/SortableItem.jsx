@@ -22,7 +22,7 @@ export function SortableItem(props) {
     };
 
     return (
-        <div ref={setNodeRef} style={style} className={`sortable-item-wrapper ${isDragging ? 'dragging' : ''}`} {...attributes} {...listeners}>
+        <div ref={setNodeRef} style={style} className={`sortable-item-wrapper ${isDragging ? 'dragging' : ''}`} {...attributes} {...listeners} tabIndex={-1}>
             <div className="sortable-content">
                 {props.children}
             </div>
