@@ -298,6 +298,7 @@ input::placeholder {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--card-border);
   border-radius: 16px;
+  position: relative;
   transition: var(--transition-slow);
   animation: slideIn 0.4s ease-out;
   min-height: 70px;
@@ -393,7 +394,8 @@ input::placeholder {
 }
 
 .todo-item:hover .item-actions,
-.todo-item.keyboard-selected .item-actions {
+.todo-item.keyboard-selected .item-actions,
+.todo-item.menu-open .item-actions {
   opacity: 1;
 }
 
@@ -410,9 +412,11 @@ input::placeholder {
 }
 
 .todo-item:hover,
-.todo-item.keyboard-selected {
+.todo-item.keyboard-selected,
+.todo-item.menu-open {
   background: rgba(255, 255, 255, 0.04);
   transform: translateX(4px);
+  z-index: 100;
 }
 
 /* Skip hover transform while editing to prevent jitter */

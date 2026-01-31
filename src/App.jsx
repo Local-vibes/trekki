@@ -206,7 +206,15 @@ function App() {
             e.preventDefault()
             setShowHelp(false)
           }
-          break
+          if (isListMenuOpen) {
+            e.preventDefault()
+            setIsListMenuOpen(false)
+          }
+          if (movingItemId) {
+            e.preventDefault()
+            setMovingItemId(null)
+          }
+          break;
         case 'arrowup':
         case 'arrowdown': {
           if (todos.length === 0) return
@@ -246,7 +254,25 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [hoveredId, editingId, todos, showHelp, past, future])
+  }, [hoveredId, editingId, todos, showHelp, past, future, isListMenuOpen, movingItemId])
+
+  // Click away listener for menus
+  useEffect(() => {
+    const handleClickAway = (e) => {
+      // Close list menu if click is outside switcher and dropdown
+      if (isListMenuOpen && !e.target.closest('.dropdown-menu') && !e.target.closest('.breadcrumb-list')) {
+        setIsListMenuOpen(false)
+      }
+
+      // Close item action menu if click is outside the "More" button and the menu itself
+      if (movingItemId && !e.target.closest('.item-action-menu') && !e.target.closest('.btn-move')) {
+        setMovingItemId(null)
+      }
+    }
+
+    window.addEventListener('mousedown', handleClickAway)
+    return () => window.removeEventListener('mousedown', handleClickAway)
+  }, [isListMenuOpen, movingItemId])
 
   useEffect(() => {
     localStorage.setItem('trekki_lists', JSON.stringify(lists))
@@ -428,7 +454,7 @@ function App() {
               {todos.map(todo => (
                 <SortableItem key={todo.id} id={todo.id}>
                   <div
-                    className={`todo-item ${editingId === todo.id ? 'editing' : ''} ${hoveredId === todo.id ? 'keyboard-selected' : ''}`}
+                    className={`todo-item ${editingId === todo.id ? 'editing' : ''} ${hoveredId === todo.id ? 'keyboard-selected' : ''} ${movingItemId === todo.id ? 'menu-open' : ''}`}
                     onMouseEnter={() => setHoveredId(todo.id)}
                     onMouseLeave={() => setHoveredId(null)}
                   >
@@ -472,7 +498,7 @@ function App() {
                         <span className={`todo-text ${todo.completed ? 'completed' : ''}`}>
                           {todo.text}
                         </span>
-                        <div className="item-actions">
+                        <div className={`item-actions ${movingItemId === todo.id ? 'menu-open' : ''}`}>
                           <button
                             className="btn-action btn-edit"
                             onClick={() => startEditing(todo)}
