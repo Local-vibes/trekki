@@ -1,4 +1,4 @@
-# Trekki Notes - Premium Todo App
+# Trekki - Todo App
 
 A sleek, modern Todo application built with **React** and **Bun**, featuring a premium glassmorphism design.
 
