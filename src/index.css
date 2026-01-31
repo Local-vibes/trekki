@@ -64,7 +64,7 @@ h1 {
 .breadcrumb-main {
   background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
   background-clip: text;
-  padding-right: 0.8rem !important;
+  padding-right: 0.8rem;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -170,7 +170,8 @@ h1 {
   flex: 1;
 }
 
-.list-item-actions {
+.list-item-actions,
+.item-actions {
   display: flex;
   gap: 0.25rem;
   opacity: 0;
@@ -179,7 +180,10 @@ h1 {
 
 .dropdown-item:hover .list-item-actions,
 .dropdown-item.keyboard-selected .list-item-actions,
-.dropdown-item.menu-open .list-item-actions {
+.dropdown-item.menu-open .list-item-actions,
+.todo-item:hover .item-actions,
+.todo-item.keyboard-selected .item-actions,
+.todo-item.menu-open .item-actions {
   opacity: 1;
 }
 
@@ -206,7 +210,8 @@ h1 {
   background: rgba(0, 0, 0, 0.3);
 }
 
-.btn-more-list {
+.btn-more-list,
+.btn-move {
   position: relative;
 }
 
@@ -292,10 +297,6 @@ h1 {
 
 .action-menu-item.danger .menu-kbd {
   border-color: rgba(239, 68, 68, 0.2);
-}
-
-.btn-move {
-  position: relative;
 }
 
 .input-container {
@@ -440,7 +441,8 @@ input::placeholder {
   background: rgba(16, 185, 129, 0.1);
 }
 
-.btn-cancel:hover {
+.btn-cancel:hover,
+.btn-delete:hover {
   color: var(--danger);
   background: rgba(239, 68, 68, 0.1);
 }
@@ -448,25 +450,6 @@ input::placeholder {
 .btn-edit:hover {
   color: var(--accent-primary);
   background: rgba(99, 102, 241, 0.1);
-}
-
-.btn-delete:hover {
-  color: var(--danger);
-  background: rgba(239, 68, 68, 0.1);
-}
-
-/* Item Actions Group */
-.item-actions {
-  display: flex;
-  gap: 0.25rem;
-  opacity: 0;
-  transition: var(--transition-fast);
-}
-
-.todo-item:hover .item-actions,
-.todo-item.keyboard-selected .item-actions,
-.todo-item.menu-open .item-actions {
-  opacity: 1;
 }
 
 @keyframes slideIn {
@@ -482,26 +465,24 @@ input::placeholder {
 }
 
 .todo-item:hover,
-.todo-item.keyboard-selected,
 .todo-item.menu-open {
   background: rgba(255, 255, 255, 0.04);
   transform: translateX(4px);
   z-index: 100;
 }
 
-/* Skip hover transform while editing to prevent jitter */
-.todo-item.editing:hover,
-.todo-item.editing.keyboard-selected {
-  transform: none;
-}
-
 .todo-item.keyboard-selected {
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateX(4px);
+  z-index: 100;
   border-color: var(--accent-primary);
   box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
 }
 
-/* Adjustments for when editing, disable hover effect */
-.todo-item.editing:hover {
+/* Skip hover transform while editing; keep edit-state background */
+.todo-item.editing:hover,
+.todo-item.editing.keyboard-selected {
+  transform: none;
   background: rgba(99, 102, 241, 0.05);
 }
 
@@ -770,7 +751,7 @@ kbd {
 
   .breadcrumb-list {
     color: black !important;
-    padding: 0 !important;
+    padding: 0.8rem !important;
     display: inline !important;
   }
 
