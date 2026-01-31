@@ -679,6 +679,28 @@ kbd {
     text-align: left !important;
     margin-bottom: 0.5rem !important;
     font-size: 24pt !important;
+    display: block !important;
+  }
+
+  .breadcrumb-main {
+    -webkit-text-fill-color: initial !important;
+    background: none !important;
+    color: black !important;
+  }
+
+  .breadcrumb-separator {
+    color: black !important;
+    opacity: 1 !important;
+  }
+
+  .breadcrumb-list {
+    color: black !important;
+    padding: 0 !important;
+    display: inline !important;
+  }
+
+  .breadcrumb-list svg {
+    display: none !important;
   }
 
   .app-subtitle,
