@@ -16,7 +16,7 @@ export function SortableItem(props) {
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
-        zIndex: isDragging ? 10 : 'auto',
+        //zIndex: isDragging ? 10 : 10,
         opacity: isDragging ? 0.5 : 1,
         position: 'relative',
     };

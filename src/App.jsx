@@ -631,52 +631,53 @@ function App() {
                               <MoreHorizontal size={16} />
                             </button>
 
-                            {movingItemId === todo.id && (
-                              <div className="item-action-menu">
-                                <div
-                                  className="action-menu-item"
-                                  onClick={() => {
-                                    startEditing(todo)
-                                    setMovingItemId(null)
-                                  }}
-                                >
-                                  <Pencil size={14} />
-                                  <span>Edit</span>
-                                  <kbd className="menu-kbd">e</kbd>
-                                </div>
-                                <div className="action-menu-divider"></div>
-                                <div className="action-menu-title">Move to List</div>
-                                {lists.filter(l => l.id !== activeListId).length === 0 ? (
-                                  <div className="action-menu-item" style={{ opacity: 0.5, cursor: 'default' }}>
-                                    No other lists
-                                  </div>
-                                ) : (
-                                  lists.filter(l => l.id !== activeListId).map(list => (
-                                    <div
-                                      key={list.id}
-                                      className="action-menu-item"
-                                      onClick={() => moveTodo(todo.id, list.id)}
-                                    >
-                                      <FolderInput size={14} />
-                                      <span>{list.name}</span>
-                                    </div>
-                                  ))
-                                )}
-                                <div
-                                  className="action-menu-item danger"
-                                  onClick={() => deleteTodo(todo.id)}
-                                >
-                                  <Trash2 size={14} />
-                                  <span>Delete</span>
-                                  <kbd className="menu-kbd">d</kbd>
-                                </div>
-                              </div>
-                            )}
+
                           </div>
                         </div>
                       </>
                     )}
                   </div>
+                  {movingItemId === todo.id && (
+                    <div className="item-action-menu">
+                      <div
+                        className="action-menu-item"
+                        onClick={() => {
+                          startEditing(todo)
+                          setMovingItemId(null)
+                        }}
+                      >
+                        <Pencil size={14} />
+                        <span>Edit</span>
+                        <kbd className="menu-kbd">e</kbd>
+                      </div>
+                      <div className="action-menu-divider"></div>
+                      <div className="action-menu-title">Move to List</div>
+                      {lists.filter(l => l.id !== activeListId).length === 0 ? (
+                        <div className="action-menu-item" style={{ opacity: 0.5, cursor: 'default' }}>
+                          No other lists
+                        </div>
+                      ) : (
+                        lists.filter(l => l.id !== activeListId).map(list => (
+                          <div
+                            key={list.id}
+                            className="action-menu-item"
+                            onClick={() => moveTodo(todo.id, list.id)}
+                          >
+                            <FolderInput size={14} />
+                            <span>{list.name}</span>
+                          </div>
+                        ))
+                      )}
+                      <div
+                        className="action-menu-item danger"
+                        onClick={() => deleteTodo(todo.id)}
+                      >
+                        <Trash2 size={14} />
+                        <span>Delete</span>
+                        <kbd className="menu-kbd">d</kbd>
+                      </div>
+                    </div>
+                  )}
                 </SortableItem>
               ))}
             </SortableContext>
