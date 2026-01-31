@@ -227,7 +227,10 @@ function App() {
         case 'd':
           if (isListMenuOpen && hoveredListId) {
             e.preventDefault()
-            deleteList(hoveredListId)
+            const listToDelete = lists.find(l => l.id === hoveredListId)
+            if (listToDelete && confirm(`Delete list "${listToDelete.name}" and all its tasks?`)) {
+              deleteList(hoveredListId)
+            }
           } else if (hoveredId) {
             e.preventDefault()
             deleteTodo(hoveredId)
