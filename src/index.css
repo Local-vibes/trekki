@@ -64,6 +64,7 @@ h1 {
 .breadcrumb-main {
   background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
   background-clip: text;
+  padding-right: 0.8rem !important;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

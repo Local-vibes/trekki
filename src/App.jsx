@@ -447,8 +447,8 @@ function App() {
     <div className="glass-card">
       <div className="header-container">
         <h1 className="app-title">
-          <span className="breadcrumb-main">Trekki</span>
-          <span className="breadcrumb-separator">/</span>
+          <div className="breadcrumb-main">Trekki</div>
+          <div className="breadcrumb-separator">/</div>
           <div
             className="breadcrumb-list"
             onClick={() => setIsListMenuOpen(!isListMenuOpen)}
