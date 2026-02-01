@@ -11,7 +11,7 @@ Try it now on github pages: https://local-vibes.github.io/trekki/
 - Total privacy by default: Share your list simply by showing your screen.
 - Prefer analog? Instantly print your tasks.
 - Seamlessly export your tasks to Markdown.
-- No AI crap inside the app.
+- No AI-assistant bullshit inside the app.
 
 ## Getting Started
 
