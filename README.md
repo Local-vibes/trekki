@@ -2,6 +2,8 @@
 
 A sleek, modern Todo application built with **React** and **Bun**, featuring a premium glassmorphism design.
 
+Try it now on github pages: https://local-vibes.github.io/trekki/
+
 ## Features
 
 - Effortless, minimalistic task lists—no clutter, just your todos.
