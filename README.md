@@ -4,11 +4,11 @@ A sleek, modern Todo application built with **React** and **Bun**, featuring a p
 
 ## Features
 
-- 💎 **Premium Aesthetic**: Modern dark mode with glassmorphism effects and smooth transitions.
-- ⚡ **Bun Powered**: High-performance runtime for development and dependency management.
-- 💾 **Persistence**: Tasks are automatically saved to `localStorage`.
-- 🎨 **Lucide Icons**: Beautiful, consistent iconography.
-- 📱 **Responsive Design**: Optimized for various screen sizes.
+- Effortless, minimalistic task lists—no clutter, just your todos.
+- Local-first: All data is securely stored in your browser via `localStorage`.
+- Total privacy by default: Share your list simply by showing your screen.
+- Prefer analog? Instantly print your tasks.
+- Seamlessly export your tasks to Markdown.
 
 ## Getting Started
 
