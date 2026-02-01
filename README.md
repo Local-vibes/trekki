@@ -38,6 +38,32 @@ To create a production build:
 bun run build
 ```
 
+## How to use
+
+### Lists
+
+- Click the list name (e.g. "General") in the header to open the list switcher.
+- Add a list: "Add new list" at the bottom of the dropdown.
+- Switch list: click a list in the dropdown.
+- Rename/delete: open the list dropdown, click the ⋮ (more) on a list → Rename or Delete (delete only when more than one list).
+
+### Tasks
+
+- Add: type in the input and press Enter or click the + button.
+- Complete: click the checkbox.
+- Reorder: drag and drop.
+- Edit: click ⋮ on a task → Edit, or use keyboard (see shortcuts). Save with Enter, cancel with Esc.
+- Delete / Move to list: ⋮ on a task → Delete or "Move to List" and pick a list.
+
+### Export
+
+- Export current list as Markdown: press `p` to open the export modal, then copy from the modal.
+
+### Keyboard shortcuts
+
+- Press **h** or **?** in the app to open the full shortcut list.
+- Common: **a** = focus add-item input; **u** or **Ctrl+Z** = undo.
+
 ## Tech Stack
 
 - **Framework**: [React](https://reactjs.org/)
