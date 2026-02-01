@@ -22,26 +22,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-    
-  # Single deploy job since we're just deploying
+  # Single deploy job since we're just posting to GitHub Pages
   deploy:
     environment:
       name: github-pages
@@ -54,6 +35,8 @@ jobs:
         uses: oven-sh/setup-bun@v1
         with:
             bun-version: latest
+      - name: Install dependencies
+        run: bun install
       - name: Generate production build
         run: bun run build
       - name: Setup Pages
